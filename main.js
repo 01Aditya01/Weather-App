@@ -47,10 +47,63 @@ const loadHourlyWeatherData= (list)=>{
     hourlyElement.innerHTML=content.join("");
 }
 
+const days=["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+const months=["Jan", "Feb", "March", "April", "May", "June", "July", "Aug", "Sep", "Oct", "Nov", "Dec"]
+const getDailyWeatherData= (list)=>{
+    let dayWiseForecast= new Map()
+    for (let hour of list){
+        let [date]= hour.dt_txt.split(" ");
+        const day= days[new Date(date).getDay()];
+        if (dayWiseForecast.has(day)){
+            let dayData= dayWiseForecast.get(day)
+            dayData.push(hour)
+        }
+        else{
+            dayWiseForecast.set(day, [hour])
+        }
+
+    }
+    arr= new Array();
+    for ([key,value] of dayWiseForecast){
+        temp_min=Math.min(...value.map(obj=>obj.temp_min))
+        temp_max=Math.max(...value.map(obj=>obj.temp_max))
+        const firstHour=value.find(obj=>obj.icon&&obj.description)
+        // let dt_txt.slice(5,7)
+        let forecastDate= `${months[(firstHour.dt_txt.slice(5,7))-1]} ${firstHour.dt_txt.slice(8,10)}`;
+        arr.push({day:key,forecastDate,temp_min,temp_max,icon:firstHour.icon,description: firstHour.description })
+    }
+    return arr
+}
+
+const loadDailyWeatherData= (dailyList)=>{
+    const dailyElement= document.querySelector("#daily_forecast .daily-container")
+    let dailyContent=[]
+    const today=dailyList[0]
+    dailyContent.push(`
+        <article>
+            <p class="day">Today</p>
+            <p class="date">${today.forecastDate}</p>
+            <img class="daily-icon" src=${getIconUrl(today.icon)} alt="">
+            <p class="daily-description">this is something longer</p>
+        </article>`
+    )
+    
+    for (let i=1; i<dailyList.length;i++){
+        dailyContent.push(`
+        <article class="daily-grid-element">
+            <p class="day">${dailyList[i].day}</p>
+            <p class="date">${dailyList[i].forecastDate}</p>
+            <img class="daily-icon" src=${getIconUrl(dailyList[i].icon)} alt="">
+            <p class="daily-description">${dailyList[i].description}</p>
+        </article>`)
+    }
+
+    dailyElement.innerHTML= dailyContent.join("")
+}
+
 const loadWindData= ({wind:{speed}, main:{humidity}})=>{
     const windElement= document.querySelector("#wind");
     windElement.querySelector(".wind-speed").innerHTML=speed+" m/s";
-    console.log(windElement)
 }
 
 const loadHumidity=({main:{humidity}})=>{
@@ -58,14 +111,37 @@ const loadHumidity=({main:{humidity}})=>{
     humidityElement.innerHTML= `${humidity} %`;
 }
 
+const correctDescriptionWidth= element=>{
+    element.style.transform= "translate(-70px,0px)";
+    element.style.transitionDuration="2s"
+    element.style.transitionTimingFunction= "linear"
+    setTimeout(()=>{
+        element.style.transitionDuration="0s"
+        element.style.transform= "translate(0px,0px)"}, 2800)
+}
+
+const checkDescriptionWidth= ()=>{
+    dailyDescriptionList= document.querySelectorAll(".daily-description")
+    gridElement= document.querySelector(".daily-grid-element")
+    
+    for (let i=0; i<dailyDescriptionList.length;i++){
+        console.log(dailyDescriptionList[i].scrollWidth, gridElement.clientWidth)
+        if (dailyDescriptionList[i].scrollWidth> gridElement.clientWidth){
+            setInterval(correctDescriptionWidth,3000,dailyDescriptionList[i])
+        }
+    }
+}
+
 document.addEventListener("DOMContentLoaded", async()=>{
     const currentWeather= await getCurrentWeatherData();
     loadCurrentWeatherData(currentWeather)
     const hourlyWeather= await getHourlyWeatherData(currentWeather)
     loadHourlyWeatherData(hourlyWeather)
+    const dailyWeather= getDailyWeatherData(hourlyWeather)
+    loadDailyWeatherData(dailyWeather)
     loadWindData(currentWeather)
     loadHumidity(currentWeather)
-
+    checkDescriptionWidth()
 
 
 })

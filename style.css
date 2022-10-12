@@ -7,12 +7,13 @@
     --spacing-small: 8px;
     --spacing-regular: 16px;
 
-    --font-small: 0.5rem;
+    --font-small: 0.8rem;
     --font-regular: 1rem;
     --font-large: 2rem;
     --font-xl: 4rem;
 
     --font-semibold: 600;
+    --font-light: 450;
 
     background-color: rgb(255, 255, 214);
 }
@@ -38,7 +39,7 @@ body{
     "daily daily"
     "wind humidity";
     gap: var(--spacing-regular);
-    padding: var(--spacing-regular);
+    /* padding: var(--spacing-regular); */
 }
 .container>section{
     padding: var(--spacing-regular);
@@ -54,7 +55,9 @@ body{
 #current_forecast .temp{
     font-size: var(--font-xl);
 }
+
 #current_forecast .description, #current_forecast .min-max-temp {
+    margin-top: 0;
     font-size: var(--font-regular);
     font-weight: var(--font-semibold);
     text-transform: capitalize;
@@ -66,22 +69,47 @@ body{
 
 #hourly_forecast .hourly-container{
     display: grid;
-    grid-template-columns: repeat(auto-fit, 1fr);
     grid-auto-flow: column;
     overflow-x: auto;
     text-align: center;
-}
-#hourly_forecast .hourly-container{
+    font-size: var(--font-regular);
     font-weight: var(--font-semibold);
 }
-
 
 #hourly_forecast .heading{
     text-align: center;
 }
 #daily_forecast{
     grid-area: daily;
+    text-align: center;
 }
+#daily_forecast .daily-container{
+    
+    display: grid;
+    grid-template-columns: 100px;
+    grid-auto-flow: column;
+    overflow-x: auto;
+    gap: 10px;
+    text-align: center;
+    font-size: var(--font-regular);
+    font-weight: var(--font-semibold);
+}
+
+.daily-container .daily-description{
+    
+    text-transform: capitalize;
+    white-space: nowrap;
+    overflow-x: hidden;
+}
+.daily-container .daily-grid-element{
+    width: 100px;
+
+}
+.daily-container .date{
+    font-size: var(--font-small);
+    font-weight: var(--font-light);
+}
+
 #wind{
     grid-area: wind;
     text-align: center;

@@ -14,7 +14,7 @@
         <section id="current_forecast">
             <h1 class="city">city</h1>
             <p class="temp">temp</p>
-            <img src="" alt="" id="icon">
+            <img class="icon" src="" alt="" id="icon">
             <p class="description">description</p>
             <p class="min-max-temp">min max</p>
         </section>
@@ -22,19 +22,27 @@
         <section id="hourly_forecast">
             <h3 class="heading">Hourly Forecast</h3>
             <section class="hourly-container">
-
-                <p>time</p>
-                <img src="" alt="">icon
-                <p>temp</p>
+                <article>
+                    <p class="hourly-time">time</p>
+                    <img class="hourly-icon" src="" alt=""> 
+                    <p class="hourly-temp">temp</p> 
+                    </article>
             </section>
         </section>
 
         <section id="daily_forecast">
-            <h3>daily forecast</h3>
-            <p>date</p>
-            <img src="" alt="">icon
-            <p>min</p>
-            <p>max</p>
+            <h3>Daily Forecast</h3>
+            <section class="daily-container">
+                <article class="daily-grid-element">
+                    <p class="day">day</p>
+                    <p class="date">date</p>
+                    <img class="daily-icon" src="" alt="">icon
+                    <p class="daily-description">description</p>
+                    <p>min</p>
+                    <p>max</p>
+                </article>
+
+            </section>
 
         </section>
 
