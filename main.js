@@ -80,11 +80,13 @@ const loadDailyWeatherData= (dailyList)=>{
     let dailyContent=[]
     const today=dailyList[0]
     dailyContent.push(`
-        <article>
+        <article class="daily-grid-element">
             <p class="day">Today</p>
             <p class="date">${today.forecastDate}</p>
             <img class="daily-icon" src=${getIconUrl(today.icon)} alt="">
-            <p class="daily-description">this is something longer</p>
+            <div class="description-container">
+                <p class="daily-description">${today.description}</p>
+            </div>
         </article>`
     )
     
@@ -94,7 +96,9 @@ const loadDailyWeatherData= (dailyList)=>{
             <p class="day">${dailyList[i].day}</p>
             <p class="date">${dailyList[i].forecastDate}</p>
             <img class="daily-icon" src=${getIconUrl(dailyList[i].icon)} alt="">
-            <p class="daily-description">${dailyList[i].description}</p>
+            <div class="description-container">
+                <p class="daily-description">${dailyList[i].description}</p>
+            </div>
         </article>`)
     }
 
@@ -112,22 +116,26 @@ const loadHumidity=({main:{humidity}})=>{
 }
 
 const correctDescriptionWidth= element=>{
-    element.style.transform= "translate(-70px,0px)";
-    element.style.transitionDuration="2s"
+    x=element.scrollWidth-70
+    element.style.transform= `translate(${-x}px,0px)`;
+    element.style.transitionDuration=`${x/35}s`
     element.style.transitionTimingFunction= "linear"
+    let delay = (x/35)*1000+800
+    
     setTimeout(()=>{
         element.style.transitionDuration="0s"
-        element.style.transform= "translate(0px,0px)"}, 2800)
+        element.style.transform= "translate(0px,0px)"},delay)
 }
 
 const checkDescriptionWidth= ()=>{
     dailyDescriptionList= document.querySelectorAll(".daily-description")
-    gridElement= document.querySelector(".daily-grid-element")
+    descriptionContainer= document.querySelector(".description-container")
     
     for (let i=0; i<dailyDescriptionList.length;i++){
-        console.log(dailyDescriptionList[i].scrollWidth, gridElement.clientWidth)
-        if (dailyDescriptionList[i].scrollWidth> gridElement.clientWidth){
-            setInterval(correctDescriptionWidth,3000,dailyDescriptionList[i])
+        descriptionWidth=dailyDescriptionList[i].scrollWidth
+        if (descriptionWidth> descriptionContainer.clientWidth){
+            correctDescriptionWidth(dailyDescriptionList[i])
+            setInterval(correctDescriptionWidth,(descriptionWidth-70)*1000/35+1200,dailyDescriptionList[i])
         }
     }
 }

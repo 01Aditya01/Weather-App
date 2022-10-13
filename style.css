@@ -14,7 +14,7 @@
 
     --font-semibold: 600;
     --font-light: 450;
-
+    --font-lightest: 380;
     background-color: rgb(255, 255, 214);
 }
 h1,h2,h3{
@@ -99,11 +99,21 @@ body{
     
     text-transform: capitalize;
     white-space: nowrap;
-    overflow-x: hidden;
+    margin: 0;
+    font-weight: var(--font-semibold);
+    font-size: var(--font-small);
+    opacity: 0.5;
+    
 }
 .daily-container .daily-grid-element{
     width: 100px;
-
+    
+}
+.daily-container .description-container{
+    overflow-x: hidden;
+    width: 84px;
+    margin-left: 8px;
+    margin-right: 8px;
 }
 .daily-container .date{
     font-size: var(--font-small);
