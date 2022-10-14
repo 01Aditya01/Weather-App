@@ -1,29 +1,58 @@
 const Api_key='63f04d892d3d0fe18f5df5633dcd5112'
+let lon;
+let lat;
 
 const formatTemp= (temp)=>{
-    temp=temp.toFixed(1)+"°";
+    temp=`${temp.toFixed(1)}°`;
     return temp
 }
-const getIconUrl= (icon)=>`http://openweathermap.org/img/wn/${icon}@2x.png`
+const getIconUrl= (icon)=>`https://openweathermap.org/img/wn/${icon}@2x.png`
+
+const getCities = async(city)=>{
+    const response= await fetch(`https://api.openweathermap.org/geo/1.0/direct?q=${city}&limit=5&appid=${Api_key}`);
+    return response.json()
+}
+
+const debounce= function(){
+    let timer;
+    return (event)=>{
+        clearTimeout(timer);
+        timer=setTimeout(()=>{onSearchInput(event)}, 300);
+    }
+}();
+
+const onSearchInput = async(event)=>{
+    const city= event.target.value;
+    if (city){
+        const data = await getCities(city)
+        const dataListElement= document.querySelector("#cities");
+        let content=[]
+        for (let {lat,lon,name,state,country} of data){
+            content.push(`<option lat="${lat}" lon="${lon}" value="${name}, ${state? `${state},`:""} ${country}">`)
+        }
+        dataListElement.innerHTML=content.join("");
+    }
+
+}
 
 const getCurrentWeatherData=async ()=> {
-    const city= "Delhi";
-    const response=await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${Api_key}&units=metric`)
+    const response=await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${Api_key}&units=metric`)
     return response.json()
 }
 
 const loadCurrentWeatherData=({name, main:{temp, temp_min, temp_max}, weather:[{description, icon}]})=>{
+    console.log(temp)
     temp=formatTemp(temp);
     const currentElement=document.querySelector("#current_forecast");
     currentElement.querySelector(".city").textContent=name;
     currentElement.querySelector(".temp").textContent=temp;
     currentElement.querySelector(".description").textContent=description;
     currentElement.querySelector(".min-max-temp").textContent=`⬆${formatTemp(temp_min)} ⬇${formatTemp(temp_max)}`;
-    currentElement.querySelector("#icon").src=`http://openweathermap.org/img/wn/${icon}@2x.png`;
+    currentElement.querySelector("#icon").src=`https://openweathermap.org/img/wn/${icon}@2x.png`;
 }
 
 const getHourlyWeatherData=async ({name:city})=>{
-    const response= await fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${Api_key}&units=metric`);
+    const response= await fetch(`https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${Api_key}&units=metric`);
     const data= await response.json();
     return data.list.map(el=>{
         const {main:{temp, temp_min, temp_max}, weather:[{description,icon}], dt_txt}= el;
@@ -33,13 +62,20 @@ const getHourlyWeatherData=async ({name:city})=>{
 
 }
 
-const loadHourlyWeatherData= (list)=>{
+const loadHourlyWeatherData= ({main:{temp: temp_now}, weather:[{icon: icon_now}]} ,list)=>{
     const hourlyElement= document.querySelector("#hourly_forecast .hourly-container");
+    const timeFormatter= new Intl.DateTimeFormat("en", {hour:"numeric" ,hour12: true}).format;
     let content=[]
-    for (let i=1;i<13;i++){
-        const time=list[i].dt_txt.split(" ")[1].slice(0,5)
+    content.push(`<article>
+        <p class="hourly-time">Now</p>
+        <img class="hourly-icon" src=${getIconUrl(icon_now)} alt=""> 
+        <p class="hourly-temp">${formatTemp(temp_now)}</p> 
+        </article>`)
+
+    for (let i=2;i<10;i++){
+        const time=new Date(list[i].dt_txt)
         content.push(`<article>
-        <p class="hourly-time">${time}</p>
+        <p class="hourly-time">${timeFormatter(time)}</p>
         <img class="hourly-icon" src=${getIconUrl(list[i].icon)} alt=""> 
         <p class="hourly-temp">${formatTemp(list[i].temp)}</p> 
         </article>`)
@@ -101,8 +137,11 @@ const loadDailyWeatherData= (dailyList)=>{
             </div>
         </article>`)
     }
-
+    dailyContent.push(`<div class="graph">
+    <canvas id="max-min-graph"></canvas>
+    </div>`)
     dailyElement.innerHTML= dailyContent.join("")
+
 }
 
 const loadWindData= ({wind:{speed}, main:{humidity}})=>{
@@ -140,16 +179,106 @@ const checkDescriptionWidth= ()=>{
     }
 }
 
-document.addEventListener("DOMContentLoaded", async()=>{
+const loadGraph= (dailyList)=>{
+    Chart.register(ChartDataLabels);
+
+    var ctx = document.querySelector("#max-min-graph")
+    const myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ["","","","","",""],
+            datasets: [{
+                label: "min temp",
+                data: dailyList.map(obj=>obj.temp_min),
+                borderWidth: 2,
+                borderColor: "hsl(200,80%,70%)",
+                fill: {target: "1", below: "hsl(180, 0%,80%,0.2)"},
+                datalabels:{
+                    align: "bottom",
+                    formatter: function(value) {
+                        return formatTemp(value);
+                      },
+                                         
+                }
+            },
+            {
+                label: "max temp",
+                data: dailyList.map(obj=>obj.temp_max),
+                borderWidth: 2,
+                borderColor: "hsl(15, 80%, 70%)",
+                // fill: true,
+                datalabels:{
+                    align: "top",
+                    formatter: function(value) {
+                        return formatTemp(value);
+                      }
+                }
+            }
+        ]
+        },
+        options: {
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    display: false,
+                    
+                },
+            },
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            layout: {
+                padding: {
+                    left: 20,
+                    right: 20,
+                    top: 20
+                }
+            }
+          },
+   
+            
+    }
+    );
+}
+
+const getCityCoordinates= (event)=>{
+    const searchValue=event.target.value;
+    const selectedOption= document.querySelector(`#cities >option[value="${searchValue}"]`)
+    if (selectedOption){
+        lat=selectedOption.getAttribute("lat");
+        lon=selectedOption.getAttribute("lon");
+        loadCityForecast()
+    }
+}
+
+const loadCityForecast = async()=>{
+    console.log("working")
     const currentWeather= await getCurrentWeatherData();
     loadCurrentWeatherData(currentWeather)
     const hourlyWeather= await getHourlyWeatherData(currentWeather)
-    loadHourlyWeatherData(hourlyWeather)
+    loadHourlyWeatherData(currentWeather, hourlyWeather)
     const dailyWeather= getDailyWeatherData(hourlyWeather)
     loadDailyWeatherData(dailyWeather)
+    loadGraph(dailyWeather)
     loadWindData(currentWeather)
     loadHumidity(currentWeather)
     checkDescriptionWidth()
+}
 
+const getCurrentLocation =(position)=>{
+    lat = position.coords.latitude
+    lon = position.coords.longitude
+    loadCityForecast()
+}
+
+document.addEventListener("DOMContentLoaded", async()=>{
+
+    const searchElement=document.querySelector("#search")
+    searchElement.addEventListener("input",debounce);
+    searchElement.addEventListener("change",getCityCoordinates)
+    const coordinates=navigator.geolocation.getCurrentPosition(getCurrentLocation);
+    
 
 })

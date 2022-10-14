@@ -11,21 +11,25 @@
 <body>
 
     <main class="container">
+        <input list="cities" type="search" name="search" id="search" placeholder="Search city" autocomplete="off">
+        <datalist id="cities">
+            <option value="Delhi">
+        </datalist>
         <section id="current_forecast">
-            <h1 class="city">city</h1>
-            <p class="temp">temp</p>
+            <h1 class="city">---</h1>
+            <p class="temp"></p>
             <img class="icon" src="" alt="" id="icon">
-            <p class="description">description</p>
-            <p class="min-max-temp">min max</p>
+            <p class="description"></p>
+            <p class="min-max-temp"></p>
         </section>
 
         <section id="hourly_forecast">
             <h3 class="heading">Hourly Forecast</h3>
             <section class="hourly-container">
                 <article>
-                    <p class="hourly-time">time</p>
+                    <p class="hourly-time">---</p>
                     <img class="hourly-icon" src="" alt=""> 
-                    <p class="hourly-temp">temp</p> 
+                    <p class="hourly-temp"></p> 
                     </article>
             </section>
         </section>
@@ -34,32 +38,31 @@
             <h3>Daily Forecast</h3>
             <section class="daily-container">
                 <article class="daily-grid-element">
-                    <p class="day">day</p>
-                    <p class="date">date</p>
-                    <img class="daily-icon" src="" alt="">icon
+                    <p class="day">---</p>
+                    <p class="date"></p>
+                    <img class="daily-icon" src="" alt="">
                     <div class="description-container">
-                        <p class="daily-description">description</p>
+                        <p class="daily-description"></p>
                     </div>
-                    <p>min</p>
-                    <p>max</p>
-                </article>
-
+                </article>    
+                <canvas id="max-min-graph">graph</canvas>
             </section>
-
         </section>
 
         <section id="wind">
             <h3>Wind Speed</h3>
-            <p class="wind-speed">speed</p>
+            <p class="wind-speed">---</p>
         </section>
 
         <section id="humidity">
             <h3>Humidity</h3>
-            <p class="humidity-data"></p>
+            <p class="humidity-data">---</p>
             
         </section>
 
     </main>
-    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0/dist/chartjs-plugin-datalabels.min.js"></script>
+
 </body>
 </html>
