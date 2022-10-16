@@ -3,6 +3,7 @@
     font-family: sans-serif;
 }
 
+
 :root{
     --spacing-small: 8px;
     --spacing-regular: 16px;
@@ -15,8 +16,20 @@
     --font-semibold: 600;
     --font-light: 450;
     --font-lightest: 380;
-    background-color: rgb(255, 255, 214);
+    background: url(./photos/01d.jpg);
+    background-size: cover; 
+  background-position: center center;
+  background-repeat: no-repeat;
 }
+
+/* html { 
+    background: no-repeat center center fixed; 
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+  } */
+
 h1,h2,h3{
     margin-top: 0;
     margin-bottom: 10px;
@@ -25,7 +38,7 @@ p{
     margin: var(--spacing-small);
 }
 body{
-    width: 400px;
+    max-width: 800px;
     margin: auto;
     padding: var(--spacing-regular);
 }
@@ -73,6 +86,7 @@ body{
 
 #hourly_forecast{
     grid-area: hourly;
+    height: 100%;
 }
 
 #hourly_forecast .hourly-container{
@@ -82,6 +96,7 @@ body{
     text-align: center;
     font-size: var(--font-regular);
     font-weight: var(--font-semibold);
+    /* height: 100%; */
 }
 
 #hourly_forecast .heading{
@@ -143,4 +158,26 @@ body{
     grid-area: humidity;
     font-weight: var(--font-semibold);
     text-align: center;
+}
+
+@media (width>=650px){
+
+    .container{
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        grid-template-areas: 
+        "search search search search"
+        "current current hourly hourly"
+        "daily daily daily daily"
+        "wind wind humidity humidity";
+        gap: var(--spacing-regular);
+        /* padding: var(--spacing-regular); */
+    }    
+
+    #hourly_forecast{
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+    }
+   
 }

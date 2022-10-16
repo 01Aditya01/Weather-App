@@ -43,6 +43,7 @@ const getCurrentWeatherData=async ()=> {
 const loadCurrentWeatherData=({name, main:{temp, temp_min, temp_max}, weather:[{description, icon}]})=>{
     console.log(temp)
     temp=formatTemp(temp);
+    document.body.parentElement.style.backgroundImage=`url(./photos/${icon}.jpg)`
     const currentElement=document.querySelector("#current_forecast");
     currentElement.querySelector(".city").textContent=name;
     currentElement.querySelector(".temp").textContent=temp;
@@ -103,7 +104,13 @@ const getDailyWeatherData= (list)=>{
     for ([key,value] of dayWiseForecast){
         temp_min=Math.min(...value.map(obj=>obj.temp_min))
         temp_max=Math.max(...value.map(obj=>obj.temp_max))
-        const firstHour=value.find(obj=>obj.icon&&obj.description)
+        let firstHour;
+        if (value.length>=5){
+            firstHour= value[4]
+        }
+        else {
+            firstHour=value.find(obj=>obj.icon&&obj.description)
+        }
         // let dt_txt.slice(5,7)
         let forecastDate= `${months[(firstHour.dt_txt.slice(5,7))-1]} ${firstHour.dt_txt.slice(8,10)}`;
         arr.push({day:key,forecastDate,temp_min,temp_max,icon:firstHour.icon,description: firstHour.description })
@@ -191,10 +198,14 @@ const loadGraph= (dailyList)=>{
                 label: "min temp",
                 data: dailyList.map(obj=>obj.temp_min),
                 borderWidth: 2,
-                borderColor: "hsl(200,80%,70%)",
+                borderColor: "hsl(250,100%,65%)",
                 fill: {target: "1", below: "hsl(180, 0%,80%,0.2)"},
                 datalabels:{
                     align: "bottom",
+                    font: {
+                        weight: 600,
+                        size: 13,
+                    },
                     formatter: function(value) {
                         return formatTemp(value);
                       },
@@ -205,10 +216,14 @@ const loadGraph= (dailyList)=>{
                 label: "max temp",
                 data: dailyList.map(obj=>obj.temp_max),
                 borderWidth: 2,
-                borderColor: "hsl(15, 80%, 70%)",
+                borderColor: "hsl(45, 100%, 70%)",
                 // fill: true,
                 datalabels:{
                     align: "top",
+                    font: {
+                        weight: 'bold',
+                        size: 13,
+                    },
                     formatter: function(value) {
                         return formatTemp(value);
                       }
@@ -233,7 +248,7 @@ const loadGraph= (dailyList)=>{
                 padding: {
                     left: 20,
                     right: 20,
-                    top: 20
+                    top: 25
                 }
             }
           },
@@ -244,6 +259,7 @@ const loadGraph= (dailyList)=>{
 }
 
 const getCityCoordinates= (event)=>{
+    event.target.blur();
     const searchValue=event.target.value;
     const selectedOption= document.querySelector(`#cities >option[value="${searchValue}"]`)
     if (selectedOption){
@@ -278,7 +294,6 @@ document.addEventListener("DOMContentLoaded", async()=>{
     const searchElement=document.querySelector("#search")
     searchElement.addEventListener("input",debounce);
     searchElement.addEventListener("change",getCityCoordinates)
-    const coordinates=navigator.geolocation.getCurrentPosition(getCurrentLocation);
-    
+    const coordinates=navigator.geolocation.getCurrentPosition(getCurrentLocation, (error)=>console.log(error));
 
 })
