@@ -41,7 +41,6 @@ const getCurrentWeatherData=async ()=> {
 }
 
 const loadCurrentWeatherData=({name, main:{temp, temp_min, temp_max}, weather:[{description, icon}]})=>{
-    console.log(temp)
     temp=formatTemp(temp);
     document.body.parentElement.style.backgroundImage=`url(./photos/${icon}.jpg)`
     const currentElement=document.querySelector("#current_forecast");
@@ -270,7 +269,6 @@ const getCityCoordinates= (event)=>{
 }
 
 const loadCityForecast = async()=>{
-    console.log("working")
     const currentWeather= await getCurrentWeatherData();
     loadCurrentWeatherData(currentWeather)
     const hourlyWeather= await getHourlyWeatherData(currentWeather)
